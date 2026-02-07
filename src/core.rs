@@ -377,8 +377,8 @@ pub struct ArrowSpace {
     pub taumode: TauMode,              // tau_mode as in select_tau_mode
 
     // lambdas normalisation
-    min_lambdas: f64,
-    max_lambdas: f64,
+    pub min_lambdas: f64,
+    pub max_lambdas: f64,
     pub(crate) range_lambdas: f64,
 
     pub n_clusters: usize,
@@ -1540,6 +1540,82 @@ impl ArrowSpace {
         );
 
         config
+    }
+
+    /// Reconstruct ArrowSpace from stored parquet files.
+    ///
+    /// This method loads all necessary components from disk without recomputation.
+    ///
+    /// # Arguments
+    /// * `storage_path` - Directory containing the parquet files
+    /// * `dataset_name` - Prefix of the files (e.g., "dorothea_highdim")
+    ///
+    /// # Example
+    /// ```ignore
+    /// let aspace = ArrowSpace::new_from_storage("storage/", "dorothea_highdim")?;
+    /// ```
+    #[cfg(feature = "storage")]
+    pub fn new_from_storage(
+        storage_path: impl AsRef<std::path::Path>,
+        dataset_name: &str,
+    ) -> Result<Self, crate::storage::StorageError> {
+        use crate::storage::parquet::{load_dense_matrix, load_lambda};
+
+        let base_path = storage_path.as_ref();
+
+        // 1. Load raw input data
+        let raw_path = base_path.join(format!("{}-raw_input.parquet", dataset_name));
+        let data = load_dense_matrix(&raw_path)?;
+        let (nitems, nfeatures) = data.shape();
+
+        // 2. Load lambdas (1-row matrix -> Vec<f64>)
+        let lambdas_path = base_path.join(format!("{}-lambdas.parquet", dataset_name));
+        let lambdas = load_lambda(&lambdas_path)?;
+
+        if lambdas.len() != nitems {
+            return Err(crate::storage::StorageError::Invalid(format!(
+                "Lambda count ({}) doesn't match items ({})",
+                lambdas.len(),
+                nitems
+            )));
+        }
+
+        // 3. Compute lambda statistics
+        let min_lambdas = lambdas.iter().fold(f64::INFINITY, |a, &b| a.min(b));
+        let max_lambdas = lambdas.iter().fold(f64::NEG_INFINITY, |a, &b| a.max(b));
+        let range_lambdas = max_lambdas - min_lambdas;
+
+        // 4. Build the ArrowSpace struct
+        let mut aspace = Self {
+            nfeatures,
+            nitems,
+            data,
+            signals: sprs::CsMat::zero((0, 0)),
+            lambdas,
+            lambdas_sorted: SortedLambdas::new(),
+            // Computed private fields
+            min_lambdas,
+            max_lambdas,
+            range_lambdas,
+            // Default values for other fields
+            taumode: TauMode::Median,
+            n_clusters: 0,
+            cluster_assignments: vec![],
+            cluster_sizes: vec![],
+            cluster_radius: 0.0,
+            projection_matrix: None,
+            reduced_dim: None,
+            extra_reduced_dim: false,
+            centroid_map: None,
+            sub_centroids: None,
+            subcentroid_lambdas: None,
+            item_norms: None,
+        };
+
+        // 5. Build sorted index
+        aspace.build_lambdas_sorted();
+
+        Ok(aspace)
     }
 }
 

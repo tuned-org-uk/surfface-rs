@@ -135,6 +135,49 @@ pub struct GraphLaplacian {
     pub energy: bool, // false if it is an eigenmap, true if it is an energymap
 }
 
+#[cfg(feature = "storage")]
+impl GraphLaplacian {
+    /// Reconstruct GraphLaplacian from stored parquet files.
+    ///
+    /// # Arguments
+    /// * `storage_path` - Directory containing the parquet files
+    /// * `dataset_name` - Prefix of the files
+    /// * `graph_params` - Graph parameters (eps, k, topk, p, sigma)
+    ///
+    /// # Example
+    /// ```ignore
+    /// let params = GraphParams { eps: 0.5, k: 10, topk: 3, p: 2.0, sigma: None, sparsity_check: false };
+    /// let gl = GraphLaplacian::new_from_storage("storage/", "dorothea_highdim", params)?;
+    /// ```
+    pub fn new_from_storage(
+        storage_path: impl AsRef<std::path::Path>,
+        dataset_name: &str,
+        graph_params: GraphParams,
+        energy: bool,
+    ) -> Result<Self, crate::storage::StorageError> {
+        use crate::storage::parquet::{load_dense_matrix, load_sparse_matrix};
+
+        let base_path = storage_path.as_ref();
+
+        // 1. Load graph laplacian matrix (sparse)
+        let gl_path = base_path.join(format!("{}-gl-matrix.parquet", dataset_name));
+        let matrix = load_sparse_matrix(&gl_path)?;
+        let nnodes = matrix.rows();
+
+        // 2. Load clustered data matrix (dense) for init_data
+        let clustered_path = base_path.join(format!("{}-clustered-dm.parquet", dataset_name));
+        let init_data = load_dense_matrix(&clustered_path)?;
+
+        Ok(Self {
+            matrix,
+            graph_params,
+            nnodes,
+            init_data,
+            energy,
+        })
+    }
+}
+
 /// Graph factory: all construction ultimately uses the λτ-graph built from data.
 ///
 /// High-level policy:
