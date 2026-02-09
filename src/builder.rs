@@ -816,6 +816,9 @@ impl ArrowSpaceBuilder {
                 // Create temporary ArrowSpace for saving raw data
                 let temp_aspace = ArrowSpace::new(rows.clone(), self.synthesis);
 
+                use std::fs;
+                fs::create_dir_all(path).unwrap();
+
                 let saved: Result<(), StorageError> = save_dense_matrix_with_builder(
                     &temp_aspace.data,
                     path.clone(),
