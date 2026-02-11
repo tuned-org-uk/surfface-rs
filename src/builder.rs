@@ -180,8 +180,16 @@ impl ClusteringHeuristic for ArrowSpaceBuilder {
             (manual_k, manual_radius, 0)
         } else {
             // Full heuristic path
-            let (h_k, h_r, h_id) =
-                self.compute_optimal_k(&rows, n_items, n_features, self.clustering_seed);
+            if self.clustering_seed.is_none() {
+                panic!("`self.clustering_seed` shoud be set for full heuristics")
+            }
+
+            let (h_k, h_r, h_id) = self.compute_optimal_k(
+                &rows,
+                n_items,
+                n_features,
+                self.clustering_seed.as_ref().unwrap().clone(),
+            );
 
             debug!(
                 "Heuristic clustering: K={}, radius={:.6}, intrinsic_dim={}",
@@ -219,7 +227,7 @@ impl ClusteringHeuristic for ArrowSpaceBuilder {
 
         // Optional JL projection for high-dimensional datasets
         let (centroids, reduced_dim) = if self.use_dims_reduction && n_features > 64 {
-            let jl_dim = compute_jl_dimension(n_clusters, self.rp_eps);
+            let jl_dim = compute_jl_dimension(n_clusters, n_features, self.rp_eps);
             let target_dim = jl_dim.min(n_features / 2);
 
             if target_dim < n_features && target_dim > clustered_dm.shape().0 {
@@ -281,7 +289,7 @@ impl ClusteringHeuristic for ArrowSpaceBuilder {
             info!("Applying early JL projection to accelerate clustering");
 
             // Compute target dimension based on item count (not cluster count)
-            let jl_dim = compute_jl_dimension(n_items, self.rp_eps);
+            let jl_dim = compute_jl_dimension(n_items, n_features, self.rp_eps);
             let target_dim = jl_dim.min(n_features / 2).max(64);
 
             info!(
@@ -340,8 +348,16 @@ impl ClusteringHeuristic for ArrowSpaceBuilder {
         // Auto-compute optimal clustering parameters via heuristic
         info!("Computing optimal clustering parameters");
         let (k_opt, radius, intrinsic_dim) = if self.cluster_max_clusters.is_none() {
-            let (k_opt, radius, intrinsic_dim) =
-                self.compute_optimal_k(&working_rows, n_items, reduced_dim, self.clustering_seed);
+            if self.clustering_seed.is_none() {
+                panic!("`self.clustering_seed` shoud be set for optimal k heuristics")
+            }
+
+            let (k_opt, radius, intrinsic_dim) = self.compute_optimal_k(
+                &working_rows,
+                n_items,
+                reduced_dim,
+                self.clustering_seed.as_ref().unwrap().clone(),
+            );
             debug!("Heuristic K={}, radius={:.4}", k_opt, radius);
             self.cluster_max_clusters = Some(k_opt);
             self.cluster_radius = radius;
@@ -468,8 +484,15 @@ impl ClusteringHeuristic for ArrowSpaceBuilder {
             (manual_k, manual_radius, 0)
         } else {
             // Full heuristic path
-            let (h_k, h_r, h_id) =
-                self.compute_optimal_k(&compute, n_items, n_features, self.clustering_seed);
+            if self.clustering_seed.is_none() {
+                panic!("`self.clustering_seed` shoud be set for full heuristics")
+            }
+            let (h_k, h_r, h_id) = self.compute_optimal_k(
+                &compute,
+                n_items,
+                n_features,
+                self.clustering_seed.as_ref().unwrap().clone(),
+            );
 
             debug!(
                 "Heuristic clustering: K={}, radius={:.6}, intrinsic_dim={}",
@@ -515,7 +538,7 @@ impl ClusteringHeuristic for ArrowSpaceBuilder {
 
         // Optional JL projection for high-dimensional datasets
         let (centroids, reduced_dim) = if self.use_dims_reduction && n_features > 64 {
-            let jl_dim = compute_jl_dimension(n_clusters, self.rp_eps);
+            let jl_dim = compute_jl_dimension(n_clusters, n_features, self.rp_eps);
             let target_dim = jl_dim.min(n_features / 2);
 
             if target_dim < n_features && target_dim > clustered_dm.shape().0 {
@@ -792,6 +815,14 @@ impl ArrowSpaceBuilder {
         // set baseline for topk
         self.define_result_k();
 
+        // generate random seed if not provided
+        if self.clustering_seed.is_none() {
+            use rand::Rng;
+            let mut rng = rand::rng();
+            let seed: u64 = rng.random();
+            self = self.with_seed(seed);
+        }
+
         info!(
             "Building ArrowSpace from {} items with {} features",
             n_items, n_features
@@ -1040,6 +1071,14 @@ impl ArrowSpaceBuilder {
 
         // set baseline for topk
         self.define_result_k();
+
+        // generate random seed if not provided
+        if self.clustering_seed.is_none() {
+            use rand::Rng;
+            let mut rng = rand::rng();
+            let seed: u64 = rng.random();
+            self = self.with_seed(seed);
+        }
 
         info!(
             "Building ArrowSpace from {} items with {} features",
