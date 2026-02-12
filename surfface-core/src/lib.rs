@@ -17,6 +17,7 @@ pub mod data;
 pub mod distance;
 pub mod laplacian;
 pub mod matrix;
+pub mod preflight;
 pub mod reduction;
 pub mod sparse;
 
