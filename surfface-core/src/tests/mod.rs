@@ -4,3 +4,4 @@ mod test_distance;
 mod test_mst;
 mod test_preflight;
 mod test_reduction;
+mod test_smoothing;

@@ -20,6 +20,7 @@ pub mod matrix;
 pub mod mst;
 pub mod preflight;
 pub mod reduction;
+pub mod smoothing_chain;
 pub mod sparse_mst;
 
 #[cfg(test)]
