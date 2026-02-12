@@ -1,6 +1,6 @@
 // surfface-core/src/matrix.rs
 use burn::tensor::backend::Backend;
-use burn::tensor::{Shape, Tensor, TensorData};
+use burn::tensor::{Tensor, TensorData};
 
 pub struct RowMatrix<B: Backend> {
     pub tensor: Tensor<B, 2>,

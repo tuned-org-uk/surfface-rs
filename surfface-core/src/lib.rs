@@ -17,9 +17,10 @@ pub mod data;
 pub mod distance;
 pub mod laplacian;
 pub mod matrix;
+pub mod mst;
 pub mod preflight;
 pub mod reduction;
-pub mod sparse;
+pub mod sparse_mst;
 
 #[cfg(test)]
 mod tests;
