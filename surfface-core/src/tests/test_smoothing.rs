@@ -15,15 +15,9 @@ use burn::tensor::{Int, Tensor, backend::Backend};
 
 type TestBackend = AutoBackend;
 
-fn init() {
-    let _ = env_logger::builder()
-        .filter_level(log::LevelFilter::Debug)
-        .is_test(true)
-        .try_init();
-}
-
 /// Create synthetic noisy centroid state with a deterministic sine + noise signal
 fn create_noisy_centroids(c: usize, f: usize, noise_level: f32) -> CentroidState<TestBackend> {
+    crate::tests::init();
     let device = Default::default();
     let mut means = Vec::with_capacity(c * f);
     for i in 0..c {
@@ -56,6 +50,7 @@ fn create_noisy_centroids(c: usize, f: usize, noise_level: f32) -> CentroidState
 /// trunk_edges is empty; all edges form the single path so there is no
 /// meaningful trunk/branch distinction in a pure chain.
 fn create_linear_mst(c: usize) -> MSTOutput {
+    crate::tests::init();
     let order: Vec<usize> = (0..c).collect();
     let mut edges = Vec::new();
     for i in 0..c.saturating_sub(1) {
@@ -83,6 +78,7 @@ fn create_linear_mst(c: usize) -> MSTOutput {
 /// Create an MSTOutput where the trunk runs through every node of the chain.
 /// Useful for testing TrunkAware: all transitions are trunk transitions.
 fn create_full_trunk_mst(c: usize) -> MSTOutput {
+    crate::tests::init();
     let order: Vec<usize> = (0..c).collect();
     let mut edges = Vec::new();
     for i in 0..c.saturating_sub(1) {
@@ -120,7 +116,6 @@ fn create_full_trunk_mst(c: usize) -> MSTOutput {
 
 #[test]
 fn test_kalman_reduces_variance() {
-    init();
     let c = 10;
     let f = 3;
     let noise_level = 0.5;
@@ -160,14 +155,18 @@ fn test_kalman_reduces_variance() {
 
 #[test]
 fn test_kalman_preserves_counts() {
-    init();
     let noisy_state = create_noisy_centroids(5, 2, 0.3);
     let mst_output = create_linear_mst(5);
 
     let output = SmoothingStage::new(SmoothingConfig::default()).execute(&noisy_state, &mst_output);
 
-    let input_counts: Vec<i64> = noisy_state.counts.to_data().to_vec().unwrap();
-    let output_counts: Vec<i64> = output.counts.to_data().to_vec().unwrap();
+    let input_counts: Vec<i32> = noisy_state
+        .counts
+        .to_data()
+        .convert::<i32>()
+        .to_vec()
+        .unwrap();
+    let output_counts: Vec<i32> = output.counts.to_data().convert::<i32>().to_vec().unwrap();
 
     assert_eq!(
         input_counts, output_counts,
@@ -177,7 +176,6 @@ fn test_kalman_preserves_counts() {
 
 #[test]
 fn test_kalman_smoothness_property() {
-    init();
     let c = 20;
     let f = 1;
 
@@ -205,7 +203,6 @@ fn test_kalman_smoothness_property() {
 
 #[test]
 fn test_kalman_conservative_vs_aggressive() {
-    init();
     let c = 10;
     let f = 2;
 
@@ -260,7 +257,6 @@ fn test_kalman_conservative_vs_aggressive() {
 
 #[test]
 fn test_kalman_single_centroid() {
-    init();
     let c = 1;
     let f = 3;
 
@@ -299,7 +295,6 @@ fn test_kalman_single_centroid() {
 
 #[test]
 fn test_kalman_numerical_stability() {
-    init();
     let c = 5;
     let f = 2;
     let device: <TestBackend as Backend>::Device = Default::default();
@@ -358,7 +353,6 @@ fn test_kalman_numerical_stability() {
 
 #[test]
 fn test_kalman_to_centroid_state() {
-    init();
     let c = 5;
     let f = 3;
 
@@ -371,14 +365,23 @@ fn test_kalman_to_centroid_state() {
     assert_eq!(smoothed_state.num_centroids(), c);
     assert_eq!(smoothed_state.feature_dim(), f);
 
-    let original_counts: Vec<i64> = noisy_state.counts.to_data().to_vec().unwrap();
-    let smoothed_counts: Vec<i64> = smoothed_state.counts.to_data().to_vec().unwrap();
+    let original_counts: Vec<i32> = noisy_state
+        .counts
+        .to_data()
+        .convert::<i32>()
+        .to_vec()
+        .unwrap();
+    let smoothed_counts: Vec<i32> = smoothed_state
+        .counts
+        .to_data()
+        .convert::<i32>()
+        .to_vec()
+        .unwrap();
     assert_eq!(original_counts, smoothed_counts, "Counts must be preserved");
 }
 
 #[test]
 fn test_kalman_forward_backward_consistency() {
-    init();
     let c = 8;
     let f = 2;
 
@@ -447,7 +450,6 @@ fn test_kalman_forward_backward_consistency() {
 
 #[test]
 fn test_kalman_smoothing_gains() {
-    init();
     let c = 10;
     let f = 2;
 
@@ -477,7 +479,6 @@ fn test_kalman_smoothing_gains() {
 
 #[test]
 fn test_kalman_disconnected_mst() {
-    init();
     let c = 5;
     let f = 2;
 
@@ -509,8 +510,6 @@ fn test_kalman_disconnected_mst() {
 
 #[test]
 fn test_kalman_config_variants() {
-    init();
-
     let default = SmoothingConfig::default();
     let conservative = SmoothingConfig::conservative();
     let aggressive = SmoothingConfig::aggressive();
@@ -527,7 +526,6 @@ fn test_kalman_config_variants() {
 
 #[test]
 fn test_kalman_deterministic() {
-    init();
     let c = 10;
     let f = 3;
 
@@ -563,7 +561,6 @@ fn test_kalman_deterministic() {
 /// This validates that the backward pass only reduces (never inflates) variance.
 #[test]
 fn test_kalman_smoothed_variance_leq_filtered() {
-    init();
     let c = 15;
     let f = 4;
 
@@ -590,7 +587,6 @@ fn test_kalman_smoothed_variance_leq_filtered() {
 /// so the smoothed mean norm must be smaller than the raw mean norm.
 #[test]
 fn test_damped_covariance_scaling() {
-    init();
     let c = 8;
     let f = 2;
     let device: <TestBackend as Backend>::Device = Default::default();
@@ -661,7 +657,6 @@ fn test_damped_covariance_scaling() {
 /// because trunk edges get lower Q (tighter smoothing).
 #[test]
 fn test_trunk_aware_lower_smoothing() {
-    init();
     let c = 10;
     let f = 2;
 

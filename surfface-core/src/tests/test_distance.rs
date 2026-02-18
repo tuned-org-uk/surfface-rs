@@ -8,7 +8,7 @@ type TestBackend = AutoBackend;
 
 #[test]
 fn test_bhattacharyya_identical_distributions() {
-    crate::init();
+    crate::tests::init();
     let device = Default::default();
 
     let mean = Tensor::<TestBackend, 1>::from_floats([1.0, 2.0, 3.0], &device);
@@ -26,7 +26,7 @@ fn test_bhattacharyya_identical_distributions() {
 
 #[test]
 fn test_bhattacharyya_different_means() {
-    crate::init();
+    crate::tests::init();
     let device = Default::default();
 
     let mean_i = Tensor::<TestBackend, 1>::from_floats([0.0, 0.0], &device);
@@ -41,7 +41,7 @@ fn test_bhattacharyya_different_means() {
 
 #[test]
 fn test_bhattacharyya_different_variances() {
-    crate::init();
+    crate::tests::init();
     let device = Default::default();
 
     let mean = Tensor::<TestBackend, 1>::from_floats([0.0, 0.0], &device);
@@ -59,7 +59,7 @@ fn test_bhattacharyya_different_variances() {
 
 #[test]
 fn test_bhattacharyya_slice_vs_tensor() {
-    crate::init();
+    crate::tests::init();
     let device = Default::default();
 
     let mean_i_vec = vec![1.0, 2.0, 3.0];
@@ -89,7 +89,7 @@ fn test_bhattacharyya_slice_vs_tensor() {
 
 #[test]
 fn test_bhattacharyya_affinity() {
-    crate::init();
+    crate::tests::init();
     let device = Default::default();
 
     // Identical distributions should have affinity ~1
@@ -109,7 +109,7 @@ fn test_bhattacharyya_affinity() {
 
 #[test]
 fn test_bhattacharyya_affinity_decay() {
-    crate::init();
+    crate::tests::init();
     let device = Default::default();
 
     let var = Tensor::<TestBackend, 1>::ones([2], &device);
@@ -134,7 +134,7 @@ fn test_bhattacharyya_affinity_decay() {
 
 #[test]
 fn test_bhattacharyya_pairwise_shape() {
-    crate::init();
+    crate::tests::init();
     let device = Default::default();
 
     // 4 features, 3 centroids
@@ -152,7 +152,7 @@ fn test_bhattacharyya_pairwise_shape() {
 
 #[test]
 fn test_bhattacharyya_pairwise_diagonal() {
-    crate::init();
+    crate::tests::init();
     let device = Default::default();
 
     let features = Tensor::<TestBackend, 2>::random(
@@ -181,7 +181,7 @@ fn test_bhattacharyya_pairwise_diagonal() {
 
 #[test]
 fn test_bhattacharyya_pairwise_symmetry() {
-    crate::init();
+    crate::tests::init();
     let device = Default::default();
 
     let features = Tensor::<TestBackend, 2>::random(
@@ -217,7 +217,7 @@ fn test_bhattacharyya_pairwise_symmetry() {
 
 #[test]
 fn test_euclidean_distance_3_4_5_triangle() {
-    crate::init();
+    crate::tests::init();
     let device = Default::default();
 
     let vec_i = Tensor::<TestBackend, 1>::from_floats([0.0, 0.0], &device);
@@ -234,7 +234,7 @@ fn test_euclidean_distance_3_4_5_triangle() {
 
 #[test]
 fn test_squared_euclidean_distance() {
-    crate::init();
+    crate::tests::init();
     let device = Default::default();
 
     let vec_i = Tensor::<TestBackend, 1>::from_floats([1.0, 2.0, 3.0], &device);
@@ -252,7 +252,7 @@ fn test_squared_euclidean_distance() {
 
 #[test]
 fn test_euclidean_slice() {
-    crate::init();
+    crate::tests::init();
 
     let vec_i = vec![0.0, 0.0];
     let vec_j = vec![3.0, 4.0];
@@ -264,7 +264,7 @@ fn test_euclidean_slice() {
 
 #[test]
 fn test_cosine_similarity_parallel_vectors() {
-    crate::init();
+    crate::tests::init();
     let device = Default::default();
 
     // Parallel vectors
@@ -282,7 +282,7 @@ fn test_cosine_similarity_parallel_vectors() {
 
 #[test]
 fn test_cosine_similarity_orthogonal_vectors() {
-    crate::init();
+    crate::tests::init();
     let device = Default::default();
 
     // Orthogonal vectors
@@ -300,7 +300,7 @@ fn test_cosine_similarity_orthogonal_vectors() {
 
 #[test]
 fn test_cosine_distance() {
-    crate::init();
+    crate::tests::init();
     let device = Default::default();
 
     let vec_i = Tensor::<TestBackend, 1>::from_floats([1.0, 0.0], &device);
@@ -318,7 +318,7 @@ fn test_cosine_distance() {
 
 #[test]
 fn test_numerical_stability_tiny_variances() {
-    crate::init();
+    crate::tests::init();
     let device = Default::default();
 
     // Very small variances (near-zero)
@@ -339,7 +339,7 @@ fn test_numerical_stability_tiny_variances() {
 
 #[test]
 fn test_numerical_stability_large_variances() {
-    crate::init();
+    crate::tests::init();
     let device = Default::default();
 
     // Large variances
@@ -362,7 +362,7 @@ fn test_numerical_stability_large_variances() {
 
 #[test]
 fn test_bhattacharyya_not_a_metric() {
-    crate::init();
+    crate::tests::init();
     let device = Default::default();
 
     // Bhattacharyya distance does NOT satisfy triangle inequality
@@ -410,7 +410,7 @@ fn test_bhattacharyya_not_a_metric() {
 
 #[test]
 fn test_bhattacharyya_symmetry() {
-    crate::init();
+    crate::tests::init();
     let device = Default::default();
 
     // Bhattacharyya distance IS symmetric: D(P||Q) = D(Q||P)
@@ -435,7 +435,7 @@ fn test_bhattacharyya_symmetry() {
 
 #[test]
 fn test_bhattacharyya_increases_with_separation() {
-    crate::init();
+    crate::tests::init();
     let device = Default::default();
 
     // Distance should increase as distributions become more separated

@@ -1,10 +1,12 @@
 use crate::backend::AutoBackend;
 use crate::clustering::*;
+use crate::reduction::{ImplicitProjection, compute_jl_dimension};
 
 type TestBackend = AutoBackend;
 
 #[test]
 fn test_jl_projection() {
+    crate::tests::init();
     let proj = ImplicitProjection::new(100, 20, Some(42));
     let row = vec![1.0; 100];
     let projected = proj.project(&row);
@@ -14,6 +16,7 @@ fn test_jl_projection() {
 
 #[test]
 fn test_compute_jl_dimension() {
+    crate::tests::init();
     let dim = compute_jl_dimension(10000, 50000, 0.3);
     assert!(dim > 32);
     assert!(dim < 50000);
@@ -21,7 +24,7 @@ fn test_compute_jl_dimension() {
 
 #[test]
 fn test_clustering_without_projection() {
-    crate::init();
+    crate::tests::init();
     let device = Default::default();
 
     // Small dimension - no projection
@@ -50,7 +53,7 @@ fn test_clustering_without_projection() {
 
 #[test]
 fn test_clustering_with_projection() {
-    crate::init();
+    crate::tests::init();
     let device = Default::default();
 
     // High dimension - trigger projection
@@ -75,7 +78,7 @@ fn test_clustering_with_projection() {
 
 #[test]
 fn test_incremental_clustering_deterministic() {
-    crate::init();
+    crate::tests::init();
     let device = Default::default();
 
     let data: Vec<Vec<f32>> = (0..100)

@@ -7,7 +7,7 @@ type TestBackend = AutoBackend;
 
 #[test]
 fn test_mst_basic_linear_chain() {
-    crate::init();
+    crate::tests::init();
     let device = Default::default();
 
     // Create 5 centroids in a line
@@ -46,7 +46,7 @@ fn test_mst_basic_linear_chain() {
 
 #[test]
 fn test_mst_tree_property() {
-    crate::init();
+    crate::tests::init();
     let device = Default::default();
 
     // Create 10 random centroids
@@ -77,7 +77,7 @@ fn test_mst_tree_property() {
 
 #[test]
 fn test_mst_thickness_weighting() {
-    crate::init();
+    crate::tests::init();
     let device = Default::default();
 
     // Create centroids with varying variances
@@ -120,7 +120,7 @@ fn test_mst_thickness_weighting() {
 
 #[test]
 fn test_mst_different_distance_metrics() {
-    crate::init();
+    crate::tests::init();
     let device = Default::default();
 
     let centroids = Tensor::<TestBackend, 2>::random(
@@ -171,7 +171,7 @@ fn test_mst_different_distance_metrics() {
 
 #[test]
 fn test_trunk_identification() {
-    crate::init();
+    crate::tests::init();
     let device = Default::default();
 
     // Create a "star" topology: one central thick node, thin nodes around it
@@ -209,7 +209,7 @@ fn test_trunk_identification() {
 
 #[test]
 fn test_dfs_ordering_completeness() {
-    crate::init();
+    crate::tests::init();
     let device = Default::default();
 
     let centroids = Tensor::<TestBackend, 2>::random(
@@ -242,7 +242,7 @@ fn test_dfs_ordering_completeness() {
 
 #[test]
 fn test_dfs_ordering_determinism() {
-    crate::init();
+    crate::tests::init();
     let device = Default::default();
 
     let centroids = Tensor::<TestBackend, 2>::random(
@@ -272,7 +272,7 @@ fn test_dfs_ordering_determinism() {
 
 #[test]
 fn test_thickness_weight_functions() {
-    crate::init();
+    crate::tests::init();
     let device = Default::default();
 
     let centroids = Tensor::<TestBackend, 2>::ones([4, 3], &device);
@@ -327,7 +327,7 @@ fn test_thickness_weight_functions() {
 
 #[test]
 fn test_mst_k_neighbors_parameter() {
-    crate::init();
+    crate::tests::init();
     let device = Default::default();
 
     let centroids = Tensor::<TestBackend, 2>::random(
@@ -364,7 +364,7 @@ fn test_mst_k_neighbors_parameter() {
 
 #[test]
 fn test_mst_config_presets() {
-    crate::init();
+    crate::tests::init();
     let device = Default::default();
 
     let centroids = Tensor::<TestBackend, 2>::random(
@@ -397,7 +397,7 @@ fn test_mst_config_presets() {
 
 #[test]
 fn test_mst_edge_properties() {
-    crate::init();
+    crate::tests::init();
     let device = Default::default();
 
     let centroids = Tensor::<TestBackend, 2>::random(
@@ -440,7 +440,7 @@ fn test_mst_edge_properties() {
 
 #[test]
 fn test_mst_total_weight_consistency() {
-    crate::init();
+    crate::tests::init();
     let device = Default::default();
 
     let centroids = Tensor::<TestBackend, 2>::random(

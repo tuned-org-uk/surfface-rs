@@ -36,6 +36,7 @@ fn centroid_state_from_rows(
     var_scale: f32,
     seed: u64,
 ) -> CentroidState<TestBackend> {
+    crate::tests::init();
     let device: <TestBackend as Backend>::Device = Default::default();
     let c = rows.len();
     let f = rows[0].len();
@@ -63,6 +64,7 @@ fn centroids_from_gaussian_blobs(
     noise: f32,
     seed: u64,
 ) -> CentroidState<TestBackend> {
+    crate::tests::init();
     let device: <TestBackend as Backend>::Device = Default::default();
     let mut rng = rand::rngs::StdRng::seed_from_u64(seed);
 
@@ -105,6 +107,7 @@ fn rayleigh(lap: &CsMat<f32>, x: &[f32]) -> f32 {
 
 /// Default LaplacianConfig: normalized, k=5, suitable for small test graphs.
 fn test_config_normalized(k: usize) -> LaplacianConfig {
+    crate::tests::init();
     LaplacianConfig {
         k_neighbors: k,
         normalize: true,
@@ -114,6 +117,7 @@ fn test_config_normalized(k: usize) -> LaplacianConfig {
 }
 
 fn test_config_unnormalized(k: usize) -> LaplacianConfig {
+    crate::tests::init();
     LaplacianConfig {
         k_neighbors: k,
         normalize: false,

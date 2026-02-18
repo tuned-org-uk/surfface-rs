@@ -13,7 +13,6 @@
 pub mod backend;
 pub mod centroid;
 pub mod clustering;
-pub mod data;
 pub mod distance;
 pub mod matrix;
 pub mod mst;
@@ -33,7 +32,7 @@ static INIT: Once = Once::new();
 pub fn init() {
     INIT.call_once(|| {
         // Read RUST_LOG env variable, default to "info" if not set
-        let env = env_logger::Env::default().default_filter_or("debug");
+        let env = env_logger::Env::default().default_filter_or("info");
 
         // don't panic if called multiple times across binaries
         let _ = env_logger::Builder::from_env(env)

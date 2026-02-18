@@ -8,7 +8,7 @@ type TestBackend = AutoBackend;
 
 #[test]
 fn test_preflight_no_normalization_needed() {
-    crate::init();
+    crate::tests::init();
     let device = Default::default();
 
     // Create centroids with similar magnitudes
@@ -28,7 +28,7 @@ fn test_preflight_no_normalization_needed() {
 
 #[test]
 fn test_preflight_normalization_triggered() {
-    crate::init();
+    crate::tests::init();
     let device = Default::default();
 
     // Create centroids with 20× magnitude variance
@@ -73,7 +73,7 @@ fn test_preflight_normalization_triggered() {
 
 #[test]
 fn test_zero_variance_detection() {
-    crate::init();
+    crate::tests::init();
     let device = Default::default();
 
     // Create variances with some near-zero features
@@ -108,7 +108,7 @@ fn test_zero_variance_detection() {
 
 #[test]
 fn test_variance_regularization() {
-    crate::init();
+    crate::tests::init();
     let device = Default::default();
 
     // Create variances with extreme values
@@ -150,7 +150,7 @@ fn test_conservative_config() {
 
 #[test]
 fn test_magnitude_stats_computation() {
-    crate::init();
+    crate::tests::init();
     let device = Default::default();
 
     let centroids_data = vec![
@@ -175,7 +175,7 @@ fn test_magnitude_stats_computation() {
 
 #[test]
 fn test_normalization_preserves_direction() {
-    crate::init();
+    crate::tests::init();
     let device = Default::default();
 
     let centroids_data = vec![

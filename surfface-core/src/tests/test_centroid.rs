@@ -9,6 +9,7 @@ type TestBackend = AutoBackend;
 
 #[test]
 fn test_from_kalman_clusterer() {
+    crate::tests::init();
     let device: <AutoBackend as Backend>::Device = Default::default();
 
     // Create synthetic data as Vec<Vec<f32>>
@@ -42,6 +43,7 @@ fn test_from_kalman_clusterer() {
 
 #[test]
 fn test_manual_conversion() {
+    crate::tests::init();
     let device: <AutoBackend as Backend>::Device = Default::default();
 
     let data_vec: Vec<Vec<f32>> = (0..50)
@@ -111,6 +113,7 @@ fn test_manual_conversion() {
 
 #[test]
 fn test_thickness() {
+    crate::tests::init();
     let device = Default::default();
 
     let centroids = Tensor::<TestBackend, 2>::ones([5, 10], &device);
@@ -131,6 +134,7 @@ fn test_thickness() {
 
 #[test]
 fn test_feature_space_transpose() {
+    crate::tests::init();
     let device = Default::default();
 
     let centroids = Tensor::<TestBackend, 2>::ones([10, 100], &device);
@@ -145,6 +149,7 @@ fn test_feature_space_transpose() {
 
 #[test]
 fn test_regularize_variances() {
+    crate::tests::init();
     let device = Default::default();
 
     let centroids = Tensor::<TestBackend, 2>::ones([3, 5], &device);
@@ -164,6 +169,7 @@ fn test_regularize_variances() {
 
 #[test]
 fn test_get_feature_variances() {
+    crate::tests::init();
     let device = Default::default();
 
     let centroids = Tensor::<TestBackend, 2>::ones([5, 10], &device);

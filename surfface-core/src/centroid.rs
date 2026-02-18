@@ -1,4 +1,5 @@
-// surfface-core/src/centroid.rs
+//! Basic step of the pipeline: Spot centroids using Kalman Clustering
+
 use burn::prelude::*;
 use kalman_clustering::KalmanClusterer;
 
@@ -20,11 +21,10 @@ impl<B: Backend> CentroidState<B> {
         let [c, _] = centroids.dims();
 
         // Compute counts per centroid
-        let mut counts_vec = vec![0i64; c];
-        let assignments_data = assignments.to_data();
-        let assignments_cpu: Vec<i64> = assignments_data.to_vec().unwrap();
+        let mut counts_vec = vec![0i32; c];
+        let assignments: Vec<i32> = assignments.to_data().convert::<i32>().to_vec().unwrap();
 
-        for &c_id in &assignments_cpu {
+        for &c_id in &assignments {
             if c_id >= 0 && (c_id as usize) < c {
                 counts_vec[c_id as usize] += 1;
             }

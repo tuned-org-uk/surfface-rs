@@ -9,6 +9,7 @@
 //! Based on ArrowSpace's start_clustering_dim_reduce algorithm [file:6]
 
 use crate::centroid::CentroidState;
+use crate::reduction::{ImplicitProjection, compute_jl_dimension};
 use burn::prelude::*;
 use rayon::prelude::*;
 
@@ -64,62 +65,6 @@ impl ClusteringConfig {
             min_projected_dim: 128,
         }
     }
-}
-
-/// JL Projection matrix (implicit, seed-based) [file:6]
-pub struct ImplicitProjection {
-    pub original_dim: usize,
-    pub target_dim: usize,
-    pub seed: u64,
-}
-
-impl ImplicitProjection {
-    pub(crate) fn new(original_dim: usize, target_dim: usize, seed: Option<u64>) -> Self {
-        Self {
-            original_dim,
-            target_dim,
-            seed: seed.unwrap_or(42),
-        }
-    }
-
-    /// Project a single row: x (F) -> y (R)
-    pub(crate) fn project(&self, row: &[f32]) -> Vec<f32> {
-        use rand::{Rng, SeedableRng};
-        use rand_chacha::ChaCha8Rng;
-
-        assert_eq!(row.len(), self.original_dim);
-
-        let scale = 1.0 / (self.target_dim as f32).sqrt();
-        let mut result = vec![0.0f32; self.target_dim];
-
-        // Generate random Gaussian projection on-the-fly (memory efficient)
-        let mut rng = ChaCha8Rng::seed_from_u64(self.seed);
-
-        for j in 0..self.target_dim {
-            let mut sum = 0.0f32;
-            for i in 0..self.original_dim {
-                // Sample from N(0, 1)
-                let rand_val: f32 = rng.sample(rand_distr::StandardNormal);
-                sum += row[i] * rand_val;
-            }
-            result[j] = sum * scale;
-        }
-
-        result
-    }
-}
-
-/// Compute JL target dimension [file:6]
-pub(crate) fn compute_jl_dimension(n_points: usize, original_dim: usize, epsilon: f32) -> usize {
-    if original_dim < 32 {
-        return original_dim;
-    }
-
-    let log_n = (n_points as f32).ln();
-    let eps_sq = epsilon.powi(2);
-    let jl_bound = (8.0 * log_n / eps_sq).ceil() as usize;
-
-    jl_bound.clamp(32, original_dim)
 }
 
 /// Output of the clustering stage

@@ -1,7 +1,6 @@
 use crate::backend::AutoBackend;
 use crate::centroid::CentroidState;
 use crate::spectral::laplacian::{LaplacianConfig, LaplacianStage};
-use crate::tests::init;
 use burn::prelude::*;
 use rand::{Rng, SeedableRng};
 
@@ -14,7 +13,7 @@ use sprs::CsMat;
 
 #[test]
 fn test_laplacian_spectral_bounds_normalized() {
-    init();
+    crate::tests::init();
     // For L_sym = I - D^{-1/2} W D^{-1/2}, eigenvalues MUST lie in [0, 2].
     // We verify this using Rayleigh Quotients: R(L, x) = (x^T L x) / (x^T x).
     let state = centroids_from_gaussian_blobs(10, 20, 0.4, 777);
@@ -121,7 +120,7 @@ use sprs::CsVec;
 
 #[test]
 fn test_laplacian_nullspace_dimension() {
-    init();
+    crate::tests::init();
     // THEORY: For connected graphs, L_sym * D^{1/2}1 = 0.
     let state = centroids_from_gaussian_blobs(5, 10, 0.1, 123);
     let config = LaplacianConfig {
@@ -171,7 +170,7 @@ fn test_laplacian_nullspace_dimension() {
 
 #[test]
 fn test_high_order_neighborhood_consistency() {
-    init();
+    crate::tests::init();
     // The second-order adjacency A2 = A * A should have a similar structure.
     // We verify that the first-order Laplacian identifies "Hub" features correctly.
 
@@ -219,7 +218,7 @@ fn test_high_order_neighborhood_consistency() {
 
 #[test]
 fn test_regression_unnormalized_row_sums() {
-    init();
+    crate::tests::init();
     // THEORY: In unnormalized mode L = D - W, the sum of each row is 0.0
     // because the diagonal D_ii is defined as the sum of the weights W_ij.
 

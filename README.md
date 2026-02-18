@@ -1,6 +1,6 @@
 # surfface: Graph Wiring for any vector space
 
-(`/ˈsɝː.ffɪs/`) Enabling graph application at scale from any embeddings or from any generic vector space.
+(`/ˈsɝː.ffɪs/`) Enabling graph applications at scale from any embeddings or from any generic vector space.
 
 Inspired by [surface wiring of physical networks](https://www.nature.com/articles/s41586-025-09784-4) and [dark matter structural patterns as spotted by JWST](https://www.nature.com/articles/s41550-025-02763-9).
 
