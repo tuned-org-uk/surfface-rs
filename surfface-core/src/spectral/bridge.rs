@@ -4,7 +4,7 @@
 //! The Laplacian is uploaded once, all N items computed in one batch,
 //! and only Vec<f32> lambdas return to CPU for TauMode normalization.
 
-use crate::laplacian::LaplacianOutput;
+use crate::spectral::laplacian::LaplacianOutput;
 use crate::spectral::{compute_lambdas_gpu, laplacian_to_tensor};
 use log::{debug, info};
 

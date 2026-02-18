@@ -15,7 +15,6 @@ pub mod centroid;
 pub mod clustering;
 pub mod data;
 pub mod distance;
-pub mod laplacian;
 pub mod matrix;
 pub mod mst;
 pub mod preflight;

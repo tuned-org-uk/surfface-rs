@@ -15,6 +15,7 @@
 //!
 //! Rule used here: sum_dim(1) on [N, F] → [N, 1], then squeeze_dim::<1>(1) → [N].
 pub mod bridge;
+pub mod laplacian;
 
 use burn::prelude::*;
 use log::{debug, info, trace};

@@ -2,7 +2,7 @@
 
 use crate::backend::{AutoBackend, get_device};
 use crate::centroid::CentroidState;
-use crate::laplacian::{LaplacianConfig, LaplacianOutput, LaplacianStage};
+use crate::spectral::laplacian::{LaplacianConfig, LaplacianOutput, LaplacianStage};
 use crate::spectral::{
     bridge::compute_tau_mode_gpu, compute_lambdas_gpu, dirichlet_dispersion_gpu,
     laplacian_to_tensor, rayleigh_quotient_gpu,

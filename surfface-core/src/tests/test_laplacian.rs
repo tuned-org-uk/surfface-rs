@@ -1,6 +1,6 @@
 use crate::backend::AutoBackend;
 use crate::centroid::CentroidState;
-use crate::laplacian::{LaplacianConfig, LaplacianStage};
+use crate::spectral::laplacian::{LaplacianConfig, LaplacianStage};
 use crate::tests::init;
 use burn::prelude::*;
 use rand::{Rng, SeedableRng};
