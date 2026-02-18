@@ -29,7 +29,7 @@ env_logger = { workspace = true }
 
 [dev-dependencies]
 rand_pcg = "0.9.0"
-rand_xoshiro = "0.7.0"
+rand_xoshiro = "0.8.0"
 
 [features]
 default = ["cpu"]
