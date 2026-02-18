@@ -326,6 +326,8 @@ fn test_thickness_weight_functions() {
 }
 
 #[test]
+#[cfg(not(feature = "wgpu"))]
+#[cfg(not(feature = "cuda"))]
 fn test_mst_k_neighbors_parameter() {
     crate::tests::init();
     let device = Default::default();
@@ -359,6 +361,67 @@ fn test_mst_k_neighbors_parameter() {
 
         // MST should still have C-1 edges
         assert_eq!(output.mst_edges.len(), 9, "MST should have 9 edges");
+    }
+}
+
+#[test]
+fn test_mst_k_neighbors_parameter_no_rand() {
+    crate::tests::init();
+    let device = Default::default();
+
+    // ✅ Use a deterministic grid layout to guarantee connectivity
+    // 10 centroids in 5D space, arranged in a line with known distances
+    let centroids_data: Vec<f32> = (0..10)
+        .flat_map(|i| {
+            let x = i as f32 * 2.0; // Spread along x-axis
+            vec![x, 0.0, 0.0, 0.0, 0.0] // 5 features
+        })
+        .collect();
+
+    let centroids = Tensor::<TestBackend, 2>::from_data(
+        TensorData::new(centroids_data, Shape::new([10, 5])),
+        &device,
+    );
+
+    let counts = Tensor::<TestBackend, 1, Int>::ones([10], &device);
+    let state = CentroidState::from_clustering(centroids, counts, 0.1);
+
+    // Test with different k values
+    for k in [2, 4, 8] {
+        let config = MSTConfig {
+            k_neighbors: k,
+            ..Default::default()
+        };
+
+        let output = MSTStage::new(config).execute(&state);
+
+        // With linear layout, k=2 is sufficient for connectivity
+        // MST should always have C-1 edges for connected graph
+        assert_eq!(
+            output.mst_edges.len(),
+            9,
+            "MST should have 9 edges (k={}, got {} edges)",
+            k,
+            output.mst_edges.len()
+        );
+
+        // Candidate graph should have ~k edges per node (directed)
+        let avg_edges = output.candidate_edges.len() as f32 / 10.0;
+        assert!(
+            avg_edges >= k as f32 * 0.8 && avg_edges <= k as f32 * 1.2,
+            "Average edges per node should be ~{}, got {:.1} (k={})",
+            k,
+            avg_edges,
+            k
+        );
+
+        // All nodes should be covered
+        assert_eq!(
+            output.centroid_order.len(),
+            10,
+            "All 10 centroids should be in the ordering (k={})",
+            k
+        );
     }
 }
 
